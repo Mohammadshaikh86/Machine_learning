@@ -11,9 +11,17 @@ class LoanRiskPredictor:
     and multi-model comparisons.
     """
     def __init__(self, model_name=None):
-        self.preprocessor = joblib.load("models/preprocessor.joblib")
-        self.all_models = joblib.load("models/all_models.joblib")
-        self.feature_names = joblib.load("models/feature_names.joblib")
+        try:
+            self.preprocessor = joblib.load("models/preprocessor.joblib")
+            self.all_models = joblib.load("models/all_models.joblib")
+            self.feature_names = joblib.load("models/feature_names.joblib")
+        except Exception:
+            # If models were pickled with different numpy/scikit-learn versions on deployment host
+            from src.train_models import train_and_evaluate_all
+            train_and_evaluate_all()
+            self.preprocessor = joblib.load("models/preprocessor.joblib")
+            self.all_models = joblib.load("models/all_models.joblib")
+            self.feature_names = joblib.load("models/feature_names.joblib")
         
         if model_name and model_name in self.all_models:
             self.model_name = model_name

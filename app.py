@@ -214,13 +214,15 @@ footer    { visibility: hidden !important; }
 </style>
 """, unsafe_allow_html=True)
 
-# ── Data loaders ─────────────────────────────────────────────
 @st.cache_resource
 def load_predictor():
     return LoanRiskPredictor()
 
 @st.cache_data
 def load_metrics():
+    if not os.path.exists("models/metrics_comparison.json"):
+        from src.train_models import train_and_evaluate_all
+        train_and_evaluate_all()
     with open("models/metrics_comparison.json") as f:
         return json.load(f)
 
